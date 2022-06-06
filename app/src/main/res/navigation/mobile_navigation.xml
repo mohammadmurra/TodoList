@@ -22,4 +22,20 @@
         android:name="com.example.todotask.ui.slideshow.SlideshowFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_slideshow" />
+    <fragment
+        android:id="@+id/nav_All"
+        android:name="com.example.todotask.ui.All.AllFragment"
+        android:label="All"
+        tools:layout="@layout/fragment_all" />
+    <fragment
+        android:id="@+id/nav_search"
+        android:name="com.example.todotask.ui.Search.SearchFragment"
+        android:label="Search"
+        tools:layout="@layout/fragment_search" />
+    <fragment
+        android:id="@+id/nav_profile"
+        android:name="com.example.todotask.ui.Profile.profileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" />
+
 </navigation>
