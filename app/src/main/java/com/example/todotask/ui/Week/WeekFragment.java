@@ -1,4 +1,4 @@
-package com.example.todotask.ui.slideshow;
+package com.example.todotask.ui.Week;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,14 +12,14 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.todotask.databinding.FragmentSlideshowBinding;
 
-public class SlideshowFragment extends Fragment {
+public class WeekFragment extends Fragment {
 
     private FragmentSlideshowBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        SlideshowViewModel slideshowViewModel =
-                new ViewModelProvider(this).get(SlideshowViewModel.class);
+        WeekViewModel slideshowViewModel =
+                new ViewModelProvider(this).get(WeekViewModel.class);
 
         binding = FragmentSlideshowBinding.inflate(inflater, container, false);
         View root = binding.getRoot();

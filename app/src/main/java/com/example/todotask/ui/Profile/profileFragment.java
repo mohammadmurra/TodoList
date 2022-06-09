@@ -1,14 +1,23 @@
 package com.example.todotask.ui.Profile;
 
+import static android.content.ContentValues.TAG;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.example.todotask.LoginActivity;
 import com.example.todotask.R;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -16,6 +25,7 @@ import com.example.todotask.R;
  * create an instance of this fragment.
  */
 public class profileFragment extends Fragment {
+    TextView email,fullName,firstName,secondName;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -60,7 +70,27 @@ public class profileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view =
+                inflater.inflate(R.layout.fragment_profile,
+                        container, false);
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+        email=(TextView)view.findViewById(R.id.EmailView);
+        fullName=(TextView)view.findViewById(R.id.FullName);
+        firstName=(TextView)view.findViewById(R.id.FirstNameView);
+        secondName=(TextView)view.findViewById(R.id.SecondNameView);
+        SharedPreferences preferences = this.getActivity().getSharedPreferences("EmailSharedPrefs", Context.MODE_PRIVATE);
+        String user=preferences.getString("emailInfo","");
+        readInfo(user);
+        return  view;
+    }
+
+    private void readInfo(String user) {
+       ArrayList<String> info=LoginActivity.DB.getInfo(user);
+        Log.d(TAG, "getInfo: "+info.toString());
+
+        email.setText(info.get(0));
+        fullName.setText(info.get(1)+"  "+info.get(2));
+        firstName.setText(info.get(1));
+        secondName.setText(info.get(2));
     }
 }

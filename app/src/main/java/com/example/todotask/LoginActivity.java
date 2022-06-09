@@ -19,8 +19,10 @@ public class LoginActivity extends AppCompatActivity {
     TextView SignUp;
     Button btnlogin;
     CheckBox remember;
-    DBHelper DB;
+   public static DBHelper DB;
     private static final String LOGIN_SHARED_PREFS = "loginSharedPrefs";
+    private static final String Email_SHARED_PREFS = "EmailSharedPrefs";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +44,7 @@ public class LoginActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
 
                     editor.putString("email", user);
+
                     editor.putString("password", pass);
                     editor.commit();
                 }
@@ -51,6 +54,11 @@ public class LoginActivity extends AppCompatActivity {
                 else{
                     Boolean checkuserpass = DB.checkusernamepassword(user, pass);
                     if(checkuserpass==true){
+                        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Email_SHARED_PREFS, MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                        editor.putString("emailInfo", user);
+                        editor.commit();
                         Toast.makeText(LoginActivity.this, "Sign in successfull", Toast.LENGTH_SHORT).show();
                         Intent intent  = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(intent);
