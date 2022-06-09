@@ -1,66 +1,183 @@
 package com.example.todotask.ui.Search;
 
+import static android.content.ContentValues.TAG;
+
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.todotask.Adapter;
 import com.example.todotask.R;
+import com.example.todotask.SqLite.DBHelper;
+import com.example.todotask.Todo;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SearchFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
+
 public class SearchFragment extends Fragment {
+    private   int beforeDay ;
+    private  int afteRDay ;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    ArrayList<Todo> model = new ArrayList<>();
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
-    public SearchFragment() {
-        // Required empty public constructor
-    }
+    private Adapter adapter;
+    DBHelper DB;
+    private RecyclerView listView;
+    private FloatingActionButton floatingActionButton;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SearchFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SearchFragment newInstance(String param1, String param2) {
-        SearchFragment fragment = new SearchFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    final Calendar myCalendar= Calendar.getInstance();
 
+    private String key = "";
+    private String task;
+    private String description;
+
+    TextView fromDate,toDate;
+    Button searchButton ;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        DB=  new DBHelper(getContext());
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        View view =
+                inflater.inflate(R.layout.fragment_search,
+                        container, false);
+
+
+
+        listView = (RecyclerView) view.findViewById(R.id.idRVSearch);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
+
+        listView.setHasFixedSize(true);
+        listView.setLayoutManager(linearLayoutManager);
+        listView.addItemDecoration( new DividerItemDecoration( getContext(),LinearLayoutManager.VERTICAL));
+        // loader = new ProgressDialog(this);
+
+
+
+        floatingActionButton = view.findViewById(R.id.fab);
+        searchButton = view.findViewById(R.id.searchBtn);
+        fromDate=view.findViewById(R.id.fromDate);
+        toDate=view.findViewById(R.id.toDate);
+
+
+
+
+        DatePickerDialog.OnDateSetListener date =new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int day) {
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH,month);
+                myCalendar.set(Calendar.DAY_OF_MONTH,day);
+                afteRDay = day;
+                updateLabelFrom();
+            }
+        };
+        fromDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                new DatePickerDialog(getContext(),date,myCalendar.get(Calendar.YEAR),myCalendar.get(Calendar.MONTH),myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+        DatePickerDialog.OnDateSetListener dateTo =new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int day) {
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH,month);
+                myCalendar.set(Calendar.DAY_OF_MONTH,day);
+                beforeDay= day;
+                updateLabelTo();
+            }
+        };
+        toDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new DatePickerDialog(getContext(),dateTo,myCalendar.get(Calendar.YEAR),myCalendar.get(Calendar.MONTH),myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+        SharedPreferences preferences = this.getActivity().getSharedPreferences("EmailSharedPrefs", Context.MODE_PRIVATE);
+        String user=preferences.getString("emailInfo","");
+
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String start = fromDate.getText().toString();
+                String todate = toDate.getText().toString();
+                // model =   DB.AllTask();
+                Log.d(TAG, "testtttttttttttttt: "+start + " ssss" + todate);
+
+                model= DB.searchTask(user,start,todate);
+
+                adapter = new Adapter(model,getContext());
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), listView.VERTICAL, false);
+                listView.setLayoutManager(linearLayoutManager);
+
+                // setting our adapter to recycler view.
+                listView.setAdapter(adapter);
+
+            }
+        });
+        return view;
     }
+
+
+
+
+    private void updateLabelFrom(){
+        String myFormat="MM/dd/yy";
+        SimpleDateFormat dateFormat=new SimpleDateFormat(myFormat, Locale.US);
+        myCalendar.set(Calendar.DAY_OF_MONTH,(afteRDay));
+
+        fromDate.setText(dateFormat.format(myCalendar.getTime()));
+    }
+    private void updateLabelTo(){
+        myCalendar.set(Calendar.DAY_OF_MONTH,(beforeDay));
+
+        String myFormat="MM/dd/yy";
+        SimpleDateFormat dateFormat=new SimpleDateFormat(myFormat, Locale.US);
+        toDate.setText(dateFormat.format(myCalendar.getTime()));
+    }
+
+
+
+
+
+
+
+
+
+
+
 }

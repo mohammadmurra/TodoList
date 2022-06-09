@@ -14,8 +14,16 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.example.todotask.LoginActivity;
+import com.example.todotask.Todo;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Locale;
 
 public class DBHelper extends SQLiteOpenHelper {
 
@@ -143,5 +151,144 @@ public class DBHelper extends SQLiteOpenHelper {
         Log.d(TAG, "getInfo: "+temp.toString());
 
         return temp;
+    }
+
+    public ArrayList<Todo> AllTask(String username) {
+        // on below line we are creating a
+        // database for reading our database.
+        MyDB = LoginActivity.DB.getReadableDatabase();
+        // on below line we are creating a cursor with query to read data from database.
+           // public Todo(String id, String userName, String decrption, String name, String date) {
+
+            Cursor cursorCourses = MyDB.rawQuery("SELECT * FROM Todo WHERE name = ?", new String[] {username});
+
+        // on below line we are creating a new array list.
+        ArrayList<Todo> courseModalArrayList = new ArrayList<>();
+
+        // moving our cursor to first position.
+        if (cursorCourses.moveToFirst()) {
+            do {  //  public Todo(String id, String userName, String decrption, String name, String date) {
+
+                // on below line we are adding the data from cursor to our array list.
+                courseModalArrayList.add(new Todo(cursorCourses.getString(0),cursorCourses.getString(4),cursorCourses.getString(2),cursorCourses.getString(1),cursorCourses.getString(3)));
+
+
+            } while (cursorCourses.moveToNext());
+            // moving our cursor to next.
+        }
+        // at last closing our cursor
+        // and returning our array list.
+        cursorCourses.close();
+        return courseModalArrayList;
+    }
+    public ArrayList<Todo> Todayask(String user) {
+        // on below line we are creating a
+        // database for reading our database.
+        MyDB = LoginActivity.DB.getReadableDatabase();
+        String dates = "";
+        Date currentTime = Calendar.getInstance().getTime();
+        String myFormat="MM/dd/yy";
+        SimpleDateFormat dateFormat=new SimpleDateFormat(myFormat, Locale.US);
+        dates=dateFormat.format(currentTime.getTime());
+
+
+        // on below line we are creating a cursor with query to read data from database.
+        // public Todo(String id, String userName, String decrption, String name, String date) {
+        Cursor cursorCourses = MyDB.rawQuery("SELECT * FROM Todo WHERE date  = ? AND name = ?",  new String[] {dates,user});
+
+
+        // on below line we are creating a new array list.
+        ArrayList<Todo> courseModalArrayList = new ArrayList<>();
+
+        // moving our cursor to first position.
+        if (cursorCourses.moveToFirst()) {
+            do {  //  public Todo(String id, String userName, String decrption, String name, String date) {
+
+                // on below line we are adding the data from cursor to our array list.
+                courseModalArrayList.add(new Todo(cursorCourses.getString(0),cursorCourses.getString(4),cursorCourses.getString(2),cursorCourses.getString(1),cursorCourses.getString(3)));
+
+
+            } while (cursorCourses.moveToNext());
+            // moving our cursor to next.
+        }
+        // at last closing our cursor
+        // and returning our array list.
+        cursorCourses.close();
+        return courseModalArrayList;
+    }
+    public ArrayList<Todo> weakTask(String user) {
+        // on below line we are creating a
+        // database for reading our database.
+        String date = "";
+        Date currentTime = Calendar.getInstance().getTime();
+        String myFormat="MM/dd/yy";
+        SimpleDateFormat dateFormat=new SimpleDateFormat(myFormat, Locale.US);
+        date=dateFormat.format(currentTime.getTime());
+
+        Calendar c = Calendar.getInstance();
+        int currentWeekNumber = c.get(Calendar.WEEK_OF_YEAR);
+
+        SimpleDateFormat timeStampFormat = new SimpleDateFormat("MM/dd/yy" ,Locale.US);
+        c.set(Calendar.DAY_OF_WEEK, 7);
+        String endDate = timeStampFormat.format(c.getTime());
+
+        MyDB = LoginActivity.DB.getReadableDatabase();
+
+
+
+        // on below line we are creating a cursor with query to read data from database.
+        // public Todo(String id, String userName, String decrption, String name, String date) {
+        Cursor cursorCourses = MyDB.rawQuery("SELECT * FROM Todo WHERE   name = ?",  new String[] {user});
+
+
+        // on below line we are creating a new array list.
+        ArrayList<Todo> courseModalArrayList = new ArrayList<>();
+
+        // moving our cursor to first position.
+        if (cursorCourses.moveToFirst()) {
+            do {  //  public Todo(String id, String userName, String decrption, String name, String date) {
+if ((endDate.compareTo(cursorCourses.getString(3))>=0)&&(date.compareTo(cursorCourses.getString(3))<=0))
+                courseModalArrayList.add(new Todo(cursorCourses.getString(0),cursorCourses.getString(4),cursorCourses.getString(2),cursorCourses.getString(1),cursorCourses.getString(3)));
+
+
+            } while (cursorCourses.moveToNext());
+            // moving our cursor to next.
+        }
+        // at last closing our cursor
+        // and returning our array list.
+        cursorCourses.close();
+        Collections.sort(courseModalArrayList);
+        return courseModalArrayList;
+    }
+    public ArrayList<Todo> searchTask(String user,String start , String end) {
+
+
+
+        MyDB = LoginActivity.DB.getReadableDatabase();
+
+//        Log.d(TAG, "Todayask: "+endDate + " ssss" + date);
+
+        // on below line we are creating a cursor with query to read data from database.
+        Cursor cursorCourses = MyDB.rawQuery("SELECT * FROM Todo WHERE   name = ?",  new String[] {user});
+
+
+        // on below line we are creating a new array list.
+        ArrayList<Todo> courseModalArrayList = new ArrayList<>();
+
+        // moving our cursor to first position.
+        if (cursorCourses.moveToFirst()) {
+            do {  //  public Todo(String id, String userName, String decrption, String name, String date) {
+                if ((end.compareTo(cursorCourses.getString(3))>=0)&&(start.compareTo(cursorCourses.getString(3))<=0))
+                    courseModalArrayList.add(new Todo(cursorCourses.getString(0),cursorCourses.getString(4),cursorCourses.getString(2),cursorCourses.getString(1),cursorCourses.getString(3)));
+
+
+            } while (cursorCourses.moveToNext());
+            // moving our cursor to next.
+        }
+        // at last closing our cursor
+        // and returning our array list.
+        cursorCourses.close();
+        Collections.sort(courseModalArrayList);
+        return courseModalArrayList;
     }
 }
