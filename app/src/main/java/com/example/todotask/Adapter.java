@@ -1,11 +1,14 @@
 package com.example.todotask;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,8 +22,10 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
-String id , task , description , user , date;
+String id , task , description , user , date , satus;
     DBHelper DB;
+    AlertDialog.Builder dialogBuilder;
+    AlertDialog alertDialog;
     // variable for our array list and context
     private ArrayList<Todo> ModalArrayList;
     private Context context;
@@ -52,6 +57,12 @@ String id , task , description , user , date;
         // holder.email.setText(modal.getUserName());
         holder.taskTv.setText(modal.getName());
         holder.descriptionTv.setText(modal.getDecrption());
+        if(modal.getComplete().equals("yes"))
+            holder.stauts.setChecked(true);
+        else
+            holder.stauts.setChecked(false);
+
+
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,7 +73,18 @@ String id , task , description , user , date;
                 description = modal.getDecrption();
                 user = modal.getUserName();
                 date = modal.getDate();
+                satus = modal.getComplete();
                 updateTask();
+
+
+
+
+
+
+
+
+
+
             }
         });
 
@@ -78,7 +100,7 @@ String id , task , description , user , date;
 
         // creating variables for our text views.
         private TextView dateTv, id, email, descriptionTv, taskTv;
-
+        private Switch stauts;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             // initializing our text views
@@ -87,6 +109,7 @@ String id , task , description , user , date;
             //  id = itemView.findViewById(R.id.idTv);
             //  email = itemView.findViewById(R.id.emailTv);
             descriptionTv = itemView.findViewById(R.id.descriptionTv);
+            stauts = itemView.findViewById(R.id.CompleteTv);
         }
     }
 
@@ -101,7 +124,7 @@ String id , task , description , user , date;
 
         final EditText mTask = view.findViewById(R.id.mEditTextTask);
         final EditText mDescription = view.findViewById(R.id.mEditTextDescription);
-
+             Switch comp = view.findViewById(R.id.Complete);
        mTask.setText(task);
       mTask.setSelection(task.length());
 //
@@ -110,26 +133,37 @@ String id , task , description , user , date;
 
         Button delButton = view.findViewById(R.id.btnDelete);
         Button updateButton = view.findViewById(R.id.btnUpdate);
-
+        if(satus.equals("yes"))
+            comp.setChecked(true);
+        else
+            comp.setChecked(false);
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
              //   task = mTask.getText().toString().trim();
                 //description = mDescription.getText().toString().trim();
                 Toast.makeText(context, "id" + id, Toast.LENGTH_SHORT).show();
+                String updateTaskName , UpdateDecrption , UpdateDate , UpdateIscomplte;
+                updateTaskName = mTask.getText().toString();
+                UpdateDecrption = mDescription.getText().toString();
+                if(comp.isChecked())
+                    UpdateIscomplte = "yes";
+                else
+                    UpdateIscomplte = "no";
 
-                Boolean resul =  DB.updateTask( id.trim(),  task,  description,  date , user );
+                Boolean resul =  DB.updateTask( id.trim(),  updateTaskName,  UpdateDecrption,  date , user  , UpdateIscomplte);
+
               if(resul==true)
-                Toast.makeText(context, "add", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Updated", Toast.LENGTH_SHORT).show();
 else
                   Toast.makeText(context, "filed", Toast.LENGTH_SHORT).show();
-
 
        //         Model model = new Model(task, description, key, date);
 
 
 
                 dialog.dismiss();
+
 
             }
         });
@@ -138,6 +172,8 @@ else
             @Override
             public void onClick(View v) {
                 DB.deleteCourse(id);
+                Toast.makeText(context, "Deletted", Toast.LENGTH_SHORT).show();
+
                 dialog.dismiss();
                     }
 

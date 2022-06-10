@@ -87,11 +87,11 @@ public class NewTask extends Fragment {
         else{
             SharedPreferences preferences = this.getActivity().getSharedPreferences("EmailSharedPrefs", Context.MODE_PRIVATE);
             String user=preferences.getString("emailInfo","");
-                    boolean insertTask = DB.insertTask(taskName,taskDes,taskdate,user );
+                    boolean insertTask = DB.insertTask(taskName,taskDes,taskdate,user , "no" );
                     if(insertTask==true){
-                        Toast.makeText(getContext(), "Registered successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Add successfully", Toast.LENGTH_SHORT).show();
                     }else{
-                        Toast.makeText(getContext(), "Registration failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Add failed", Toast.LENGTH_SHORT).show();
                     }
                 }
 

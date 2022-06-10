@@ -31,7 +31,7 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase MyDB) {
       MyDB.execSQL("create Table users(username TEXT primary key, password TEXT, firstname TEXT, lastname TEXT)");
-      MyDB.execSQL("create Table if not exists Todo(id INTEGER primary key AUTOINCREMENT, task TEXT, description TEXT, date TEXT,name TEXT)");
+      MyDB.execSQL("create Table if not exists Todo(id INTEGER primary key AUTOINCREMENT, task TEXT, description TEXT, date TEXT,name TEXT , Status TEXT)");
            //MyDB = getWritableDatabase();
     }
 
@@ -59,11 +59,11 @@ public class DBHelper extends SQLiteOpenHelper {
             return true;
 
     }
-    public boolean insertTask(String taskName, String taskDes, String taskdate ,String name) {
+    public boolean insertTask(String taskName, String taskDes, String taskdate ,String name  ,String status) {
 
         Log.d(TAG, "insertTask: "+ LoginActivity.DB.getWritableDatabase());
         MyDB = LoginActivity.DB.getWritableDatabase();
-        if (MyDB.isOpen()){
+
 
 
 
@@ -73,6 +73,7 @@ public class DBHelper extends SQLiteOpenHelper {
             contentValues.put("description", taskDes);
             contentValues.put("date", taskdate);
             contentValues.put("name", name);
+            contentValues.put("Status", status);
             long result = MyDB.insert("Todo", null, contentValues);
 
             if (result == -1) return false;
@@ -80,8 +81,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 return true;
 
             }
-        }
-        return false;
+
     }
 //    public Boolean insertTask(String taskName, String taskDes, String taskdate) {
 //         MyDB = this.getWritableDatabase();
@@ -164,7 +164,7 @@ public class DBHelper extends SQLiteOpenHelper {
             do {  //  public Todo(String id, String userName, String decrption, String name, String date) {
 
                 // on below line we are adding the data from cursor to our array list.
-                courseModalArrayList.add(new Todo(cursorCourses.getString(0),cursorCourses.getString(4),cursorCourses.getString(2),cursorCourses.getString(1),cursorCourses.getString(3)));
+                courseModalArrayList.add(new Todo(cursorCourses.getString(0),cursorCourses.getString(4),cursorCourses.getString(2),cursorCourses.getString(1),cursorCourses.getString(3),cursorCourses.getString(5)));
 
 
             } while (cursorCourses.moveToNext());
@@ -199,7 +199,7 @@ public class DBHelper extends SQLiteOpenHelper {
             do {  //  public Todo(String id, String userName, String decrption, String name, String date) {
 
                 // on below line we are adding the data from cursor to our array list.
-                courseModalArrayList.add(new Todo(cursorCourses.getString(0),cursorCourses.getString(4),cursorCourses.getString(2),cursorCourses.getString(1),cursorCourses.getString(3)));
+                courseModalArrayList.add(new Todo(cursorCourses.getString(0),cursorCourses.getString(4),cursorCourses.getString(2),cursorCourses.getString(1),cursorCourses.getString(3),cursorCourses.getString(5)));
 
 
             } while (cursorCourses.moveToNext());
@@ -242,7 +242,7 @@ public class DBHelper extends SQLiteOpenHelper {
         if (cursorCourses.moveToFirst()) {
             do {  //  public Todo(String id, String userName, String decrption, String name, String date) {
 if ((endDate.compareTo(cursorCourses.getString(3))>=0)&&(date.compareTo(cursorCourses.getString(3))<=0))
-                courseModalArrayList.add(new Todo(cursorCourses.getString(0),cursorCourses.getString(4),cursorCourses.getString(2),cursorCourses.getString(1),cursorCourses.getString(3)));
+                courseModalArrayList.add(new Todo(cursorCourses.getString(0),cursorCourses.getString(4),cursorCourses.getString(2),cursorCourses.getString(1),cursorCourses.getString(3),cursorCourses.getString(5)));
 
 
             } while (cursorCourses.moveToNext());
@@ -273,7 +273,7 @@ if ((endDate.compareTo(cursorCourses.getString(3))>=0)&&(date.compareTo(cursorCo
         if (cursorCourses.moveToFirst()) {
             do {  //  public Todo(String id, String userName, String decrption, String name, String date) {
                 if ((end.compareTo(cursorCourses.getString(3))>=0)&&(start.compareTo(cursorCourses.getString(3))<=0))
-                    courseModalArrayList.add(new Todo(cursorCourses.getString(0),cursorCourses.getString(4),cursorCourses.getString(2),cursorCourses.getString(1),cursorCourses.getString(3)));
+                    courseModalArrayList.add(new Todo(cursorCourses.getString(0),cursorCourses.getString(4),cursorCourses.getString(2),cursorCourses.getString(1),cursorCourses.getString(3),cursorCourses.getString(5)));
 
 
             } while (cursorCourses.moveToNext());
@@ -285,7 +285,7 @@ if ((endDate.compareTo(cursorCourses.getString(3))>=0)&&(date.compareTo(cursorCo
         Collections.sort(courseModalArrayList);
         return courseModalArrayList;
     }
-    public boolean updateTask(String id, String taskName, String taskDes, String taskdate ,String name ){
+    public boolean updateTask(String id, String taskName, String taskDes, String taskdate ,String name , String isComplete ){
 
         // calling a method to get writable database.
         MyDB = LoginActivity.DB.getWritableDatabase();
@@ -299,6 +299,7 @@ if ((endDate.compareTo(cursorCourses.getString(3))>=0)&&(date.compareTo(cursorCo
         contentValues.put("description", taskDes);
         contentValues.put("date", taskdate);
         contentValues.put("name", name);
+        contentValues.put("Status", isComplete);
         // on below line we are calling a update method to update our database and passing our values.
         // and we are comparing it with name of our course which is stored in original name variable.
        int result=  MyDB.update("Todo", contentValues, "id=?", new String[]{id});
@@ -319,5 +320,51 @@ if ((endDate.compareTo(cursorCourses.getString(3))>=0)&&(date.compareTo(cursorCo
         // course and we are comparing it with our course name.
         MyDB.delete("Todo", "id=?", new String[]{id});
 
+    }
+
+
+    public Boolean isCompleted(String username) {
+        String dates = "";
+        Date currentTime = Calendar.getInstance().getTime();
+        String myFormat="MM/dd/yy";
+        SimpleDateFormat dateFormat=new SimpleDateFormat(myFormat, Locale.US);
+        dates=dateFormat.format(currentTime.getTime());
+
+        // on below line we are creating a
+        // database for reading our database.
+        MyDB = LoginActivity.DB.getReadableDatabase();
+        // on below line we are creating a cursor with query to read data from database.
+        // public Todo(String id, String userName, String decrption, String name, String date) {
+
+        Cursor cursorCourses = MyDB.rawQuery("SELECT * FROM Todo WHERE name = ? And date = ? ", new String[] {username,dates});
+
+        // on below line we are creating a new array list.
+        ArrayList<Todo> courseModalArrayList = new ArrayList<>();
+
+        // moving our cursor to first position.
+        if (cursorCourses.moveToFirst()) {
+            do {  //  public Todo(String id, String userName, String decrption, String name, String date) {
+
+                // on below line we are adding the data from cursor to our array list.
+                courseModalArrayList.add(new Todo(cursorCourses.getString(0),cursorCourses.getString(4),cursorCourses.getString(2),cursorCourses.getString(1),cursorCourses.getString(3),cursorCourses.getString(5)));
+
+
+            } while (cursorCourses.moveToNext());
+            // moving our cursor to next.
+        }
+        // at last closing our cursor
+        // and returning our array list.
+if(courseModalArrayList.isEmpty())
+    return  false ;
+        for(int i=0 ; i<courseModalArrayList.size() ; i++) {
+
+            if (courseModalArrayList.get(i).getComplete().equals("no"))
+                return false;
+
+        }
+
+
+        cursorCourses.close();
+        return true;
     }
 }

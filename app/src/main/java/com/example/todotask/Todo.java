@@ -6,13 +6,14 @@ public class Todo implements  Comparable<Todo> {
     String decrption ;
     String name ;
     String date ;
-
-    public Todo(String id, String userName, String decrption, String name, String date) {
+String complete ;
+    public Todo(String id, String userName, String decrption, String name, String date ,String complete) {
         this.id = id;
         this.userName = userName;
         this.decrption = decrption;
         this.name = name;
         this.date = date;
+        this.complete = complete;
     }
 
     public String getId() {
@@ -53,6 +54,14 @@ public class Todo implements  Comparable<Todo> {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getComplete() {
+        return complete;
+    }
+
+    public void setComplete(String complete) {
+        this.complete = complete;
     }
 
     @Override

@@ -57,6 +57,13 @@ public class LoginActivity extends AppCompatActivity {
                     editor.putString("password", pass);
                     editor.commit();
                 }
+                else if(!remember.isChecked()){
+                    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(LOGIN_SHARED_PREFS, MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                    editor.clear();
+                    editor.commit();
+                }
 
                 if(user.equals("")||pass.equals(""))
                     Toast.makeText(LoginActivity.this, "Please enter all the fields", Toast.LENGTH_SHORT).show();

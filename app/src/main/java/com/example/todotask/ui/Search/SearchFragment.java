@@ -85,7 +85,6 @@ public class SearchFragment extends Fragment {
 
 
 
-        floatingActionButton = view.findViewById(R.id.fab);
         searchButton = view.findViewById(R.id.searchBtn);
         fromDate=view.findViewById(R.id.fromDate);
         toDate=view.findViewById(R.id.toDate);
