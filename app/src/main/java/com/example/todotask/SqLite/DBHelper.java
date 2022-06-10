@@ -4,23 +4,17 @@ import static android.content.ContentValues.TAG;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.preference.PreferenceManager;
 import android.util.Log;
-
-import androidx.annotation.Nullable;
 
 import com.example.todotask.LoginActivity;
 import com.example.todotask.Todo;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
@@ -290,5 +284,40 @@ if ((endDate.compareTo(cursorCourses.getString(3))>=0)&&(date.compareTo(cursorCo
         cursorCourses.close();
         Collections.sort(courseModalArrayList);
         return courseModalArrayList;
+    }
+    public boolean updateTask(String id, String taskName, String taskDes, String taskdate ,String name ){
+
+        // calling a method to get writable database.
+        MyDB = LoginActivity.DB.getWritableDatabase();
+        ContentValues ContentValues = new ContentValues();
+
+
+        // on below line we are passing all values
+        // along with its key and value pair.
+        ContentValues contentValues= new ContentValues();
+        contentValues.put("task", taskName);
+        contentValues.put("description", taskDes);
+        contentValues.put("date", taskdate);
+        contentValues.put("name", name);
+        // on below line we are calling a update method to update our database and passing our values.
+        // and we are comparing it with name of our course which is stored in original name variable.
+       int result=  MyDB.update("Todo", contentValues, "id=?", new String[]{id});
+        if (result == -1) return false;
+        else {
+            return true;
+
+        }
+    }
+
+    public void deleteCourse(String id) {
+
+        // on below line we are creating
+        // a variable to write our database.
+        MyDB = LoginActivity.DB.getWritableDatabase();
+
+        // on below line we are calling a method to delete our
+        // course and we are comparing it with our course name.
+        MyDB.delete("Todo", "id=?", new String[]{id});
+
     }
 }

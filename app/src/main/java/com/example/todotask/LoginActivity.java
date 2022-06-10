@@ -1,6 +1,8 @@
 package com.example.todotask;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -25,6 +27,10 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences preferences = this.getSharedPreferences("loginSharedPrefs", Context.MODE_PRIVATE);
+        String users=preferences.getString("email","");
+        String passs=preferences.getString("password", "");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         username = (EditText) findViewById(R.id.username);
@@ -33,7 +39,10 @@ public class LoginActivity extends AppCompatActivity {
         SignUp=(TextView) findViewById(R.id.signupView);
         remember=(CheckBox)findViewById(R.id.remember_me);
         DB = new DBHelper(this);
-        btnlogin.setOnClickListener(new View.OnClickListener() {
+        if(users.isEmpty()==false && passs.isEmpty()==false){
+            username.setText(users);}
+        password.setText(passs);
+            btnlogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
