@@ -159,6 +159,8 @@ else
                   Toast.makeText(context, "filed", Toast.LENGTH_SHORT).show();
 
        //         Model model = new Model(task, description, key, date);
+if( UpdateIscomplte.equals("yes"))
+    Toast.makeText(context, "Great!  task complete", Toast.LENGTH_SHORT).show();
 
 
 
@@ -172,7 +174,7 @@ else
             @Override
             public void onClick(View v) {
                 DB.deleteCourse(id);
-                Toast.makeText(context, "Deletted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Task Deleted", Toast.LENGTH_SHORT).show();
 
                 dialog.dismiss();
                     }

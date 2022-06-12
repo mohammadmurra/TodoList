@@ -367,4 +367,30 @@ if(courseModalArrayList.isEmpty())
         cursorCourses.close();
         return true;
     }
+
+
+
+
+
+
+
+
+    public boolean updateUser(String email, String password,String firstname,String lastname){
+        MyDB = LoginActivity.DB.getWritableDatabase();
+        Log.d(TAG, "insertData: "+MyDB.isOpen());
+        ContentValues contentValues= new ContentValues();
+        contentValues.put("username", email);
+        contentValues.put("firstname", firstname);
+        contentValues.put("lastname", lastname);
+        contentValues.put("password", password);
+        int result=  MyDB.update("users", contentValues, "username=?", new String[]{email});
+
+        if(result==-1) return false;
+        else
+            return true;
+
+    }
+
+
+
 }

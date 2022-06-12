@@ -1,70 +1,56 @@
 package com.example.todotask.ui.Profile;
 
 import static android.content.ContentValues.TAG;
+import static android.content.Context.MODE_PRIVATE;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.todotask.LoginActivity;
 import com.example.todotask.R;
+import com.example.todotask.SqLite.DBHelper;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link profileFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class profileFragment extends Fragment {
     TextView email,fullName,firstName,secondName;
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public profileFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment profileFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static profileFragment newInstance(String param1, String param2) {
-        profileFragment fragment = new profileFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+Button update ;
+    String user;
+    boolean IsPasswordValid = true, IsConPasswordValid = true;
+    String regex;
+    DBHelper DB;
+    SharedPreferences preferences ;
+    private static final String LOGIN_SHARED_PREFS = "loginSharedPrefs";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        regex = "^(?=.*[0-9])"
+                + "(?=.*[a-z])"
+                + "(?=.*[A-Z])"
+                + "(?=.*[{}@#$%!])"
+                + "(?=\\S+$).{8,15}$";
+
+         preferences = getContext().getSharedPreferences("loginSharedPrefs", MODE_PRIVATE);
+
     }
 
     @Override
@@ -73,14 +59,22 @@ public class profileFragment extends Fragment {
         View view =
                 inflater.inflate(R.layout.fragment_profile,
                         container, false);
+        DB = new DBHelper(getContext());
         // Inflate the layout for this fragment
         email=(TextView)view.findViewById(R.id.EmailView);
         fullName=(TextView)view.findViewById(R.id.FullName);
         firstName=(TextView)view.findViewById(R.id.FirstNameView);
         secondName=(TextView)view.findViewById(R.id.SecondNameView);
-        SharedPreferences preferences = this.getActivity().getSharedPreferences("EmailSharedPrefs", Context.MODE_PRIVATE);
-        String user=preferences.getString("emailInfo","");
+        update = (Button)view.findViewById(R.id.updateProfile) ;
+        SharedPreferences preferences = this.getActivity().getSharedPreferences("EmailSharedPrefs", MODE_PRIVATE);
+         user=preferences.getString("emailInfo","");
         readInfo(user);
+        update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateProfile();
+            }
+        });
         return  view;
     }
 
@@ -93,4 +87,109 @@ public class profileFragment extends Fragment {
         firstName.setText(info.get(1));
         secondName.setText(info.get(2));
     }
-}
+
+    private void updateProfile() {
+
+        AlertDialog.Builder myDialog = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        View view = inflater.inflate(R.layout.fragment_edit_profile, null);
+        myDialog.setView(view);
+
+        final AlertDialog dialog = myDialog.create();
+
+        final EditText firstName = view.findViewById(R.id.UPfirstname);
+        final EditText lastName = view.findViewById(R.id.UPlastname);
+        final EditText pass = view.findViewById(R.id.UPfirstname);
+        final EditText conPass = view.findViewById(R.id.UPpassword);
+        Switch comp = view.findViewById(R.id.UPrepassword);
+
+
+        Button updateButton = view.findViewById(R.id.UpdateBTN);
+
+        updateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //   task = mTask.getText().toString().trim();
+                //description = mDescription.getText().toString().trim();
+                Toast.makeText(getContext(), "user" + user, Toast.LENGTH_SHORT).show();
+                String updateFname, UpdateSname , UpdatePass , UpdateCpass;
+
+
+                 updateFname = firstName.getText().toString();
+                 UpdateSname = lastName.getText().toString();
+                 UpdatePass = pass.getText().toString();
+                 UpdateCpass = conPass.getText().toString();
+
+                if(user.equals("")||UpdatePass.equals("")||UpdateCpass.equals("")||updateFname.equals("")||UpdateSname.equals(""))
+                    Toast.makeText(getContext(), "Please enter all the fields", Toast.LENGTH_SHORT).show();
+                else {
+                    if (isEmpty(pass)) {
+                        pass.setError("Password is required!");
+                        IsPasswordValid = false;
+
+                    } else {
+                        Pattern p = Pattern.compile(regex);
+                        Matcher m = p.matcher(pass.getText().toString());
+                        if (m.matches()) {
+                            IsPasswordValid = m.matches();
+                        } else {
+                            IsPasswordValid = m.matches();
+                            pass.setError("Password must be minimum 8 characters and maximum 15 characters. It must contain at least one number,\n" +
+                                    "one lowercase letter, one uppercase letter, and at least one special character from this character set\n" +
+                                    "only: $, %, #, @, !, {, and }.");
+                        }
+                    }
+                    if (isEmpty(conPass)) {
+                        conPass.setError("Password confirmation is required!");
+                        IsConPasswordValid = false;
+                    } else if (conPass.getText().length() < 8 && conPass.getText().length() > 15) {
+                        conPass.setError("Password must be between 8 and 15 characters long!");
+                        IsConPasswordValid = false;
+                    } else if (conPass.getText().toString().equals(pass.getText().toString())) {
+
+                        IsConPasswordValid = true;
+                    } else {
+                        conPass.setError("Those passwords did not match. Try again!");
+                        IsConPasswordValid = false;
+
+                    }
+
+
+                    if (IsConPasswordValid && IsPasswordValid) {
+
+Boolean result =  DB.updateUser(user,UpdatePass,updateFname,UpdateSname);
+                if(result==true){
+                    Toast.makeText(getContext(), "Profile Updated", Toast.LENGTH_SHORT).show();
+                    SharedPreferences sharedPreferences = getContext().getSharedPreferences(LOGIN_SHARED_PREFS, MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.clear();
+                    editor.putString("email", user);
+
+                    editor.putString("password", UpdatePass);
+                    editor.commit();
+
+                }
+                else {
+                    Toast.makeText(getContext(), "Update filed", Toast.LENGTH_SHORT).show();
+
+                }
+
+
+                        dialog.dismiss();
+
+
+                    }
+                }}});
+
+                dialog.show();
+            }
+
+
+
+
+
+    private boolean isEmpty(EditText text) {
+        CharSequence str = text.getText().toString();
+        return TextUtils.isEmpty(str);
+    }
+        }

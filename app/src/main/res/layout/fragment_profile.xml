@@ -79,9 +79,8 @@
             </LinearLayout>
 
 
-
             <Button
-                android:id="@+id/BackHomePage"
+                android:id="@+id/updateProfile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="50dp"
@@ -89,7 +88,7 @@
                 android:backgroundTint="@color/white"
                 android:backgroundTintMode="multiply"
                 android:shadowColor="@color/colorPrimaryDark"
-                android:text="HomePage" />
+                android:text="Edit  Profile " />
         </LinearLayout>
     </ScrollView>
 
