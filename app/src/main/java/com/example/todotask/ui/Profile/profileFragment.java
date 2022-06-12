@@ -101,7 +101,6 @@ Button update ;
         final EditText lastName = view.findViewById(R.id.UPlastname);
         final EditText pass = view.findViewById(R.id.UPfirstname);
         final EditText conPass = view.findViewById(R.id.UPpassword);
-        Switch comp = view.findViewById(R.id.UPrepassword);
 
 
         Button updateButton = view.findViewById(R.id.UpdateBTN);
@@ -111,7 +110,6 @@ Button update ;
             public void onClick(View v) {
                 //   task = mTask.getText().toString().trim();
                 //description = mDescription.getText().toString().trim();
-                Toast.makeText(getContext(), "user" + user, Toast.LENGTH_SHORT).show();
                 String updateFname, UpdateSname , UpdatePass , UpdateCpass;
 
 
@@ -120,7 +118,7 @@ Button update ;
                  UpdatePass = pass.getText().toString();
                  UpdateCpass = conPass.getText().toString();
 
-                if(user.equals("")||UpdatePass.equals("")||UpdateCpass.equals("")||updateFname.equals("")||UpdateSname.equals(""))
+                if(updateFname.equals("")||UpdatePass.equals("")||UpdateCpass.equals("")||updateFname.equals("")||UpdateSname.equals(""))
                     Toast.makeText(getContext(), "Please enter all the fields", Toast.LENGTH_SHORT).show();
                 else {
                     if (isEmpty(pass)) {
